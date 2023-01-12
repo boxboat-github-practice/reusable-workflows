@@ -6,33 +6,33 @@ on:
       tag:
         required: true
         type: string
-    
+
 jobs:
   build:
     runs-on: [self-hosted]
+    container: node:14.16
     defaults:
       run:
         shell: bash
         working-directory: src
 
-    steps:    
-    - uses: actions/checkout@v3
-      name: Checkout
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build
-      run: dotnet build -c release --no-restore
+      - name: Build
+        run: dotnet build -c release --no-restore
 
-    - name: Publish
-      run: dotnet publish -o app
-
+      - name: Publish
+        run: dotnet publish -o app
 #     - name: Docker Build
 #       shell: bash
 #       id: docker
@@ -45,7 +45,7 @@ jobs:
 #         registry: ghcr.io
 #         username: ${{ github.actor }}
 #         password: ${{ secrets.GITHUB_TOKEN }}
-        
+
 #     - name: Docker Publish
 #       shell: bash
 #       run: |
