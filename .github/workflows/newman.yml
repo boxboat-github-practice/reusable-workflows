@@ -1,0 +1,28 @@
+name: Newman Collection Runner
+on:
+  workflow_call:
+    inputs:
+      url:
+        required: true
+        type: string
+
+jobs:
+  test:
+    name: 'API Test'
+    runs-on: [self-hosted, podman]
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Set Azure URL
+      run: |
+        bash smoketest.sh -u ${{ inputs.url }}
+
+    - name: Run Smoke Test
+      run: |
+        bash smoketest.sh -e azure
+
