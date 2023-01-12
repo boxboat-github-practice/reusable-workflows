@@ -9,7 +9,7 @@ on:
     
 jobs:
   build:
-    runs-on: [self-hosted, podman]
+    runs-on: [self-hosted]
     defaults:
       run:
         shell: bash
