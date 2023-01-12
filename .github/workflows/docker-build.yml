@@ -1,0 +1,52 @@
+name: .NET Docker
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: src
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build -c release --no-restore
+
+      - name: Publish
+        run: dotnet publish -o app
+
+      - name: Docker Build
+        shell: bash
+        id: docker
+        run: |
+          docker buildx build . -t "ghcr.io/${GITHUB_REPOSITORY,,}:${{ inputs.tag }}" -t ghcr.io/${GITHUB_REPOSITORY,,}:latest
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Publish
+        shell: bash
+        run: |
+          docker push -a ghcr.io/${GITHUB_REPOSITORY,,}
