@@ -33,20 +33,20 @@ jobs:
     - name: Publish
       run: dotnet publish -o app
 
-    - name: Docker Build
-      shell: bash
-      id: docker
-      run: |
-        docker buildx build . -t "ghcr.io/${GITHUB_REPOSITORY,,}:${{ inputs.tag }}" -t ghcr.io/${GITHUB_REPOSITORY,,}:latest
+#     - name: Docker Build
+#       shell: bash
+#       id: docker
+#       run: |
+#         docker buildx build . -t "ghcr.io/${GITHUB_REPOSITORY,,}:${{ inputs.tag }}" -t ghcr.io/${GITHUB_REPOSITORY,,}:latest
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v2
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+#     - name: Login to GitHub Container Registry
+#       uses: docker/login-action@v2
+#       with:
+#         registry: ghcr.io
+#         username: ${{ github.actor }}
+#         password: ${{ secrets.GITHUB_TOKEN }}
         
-    - name: Docker Publish
-      shell: bash
-      run: |
-        docker push -a ghcr.io/${GITHUB_REPOSITORY,,}
+#     - name: Docker Publish
+#       shell: bash
+#       run: |
+#         docker push -a ghcr.io/${GITHUB_REPOSITORY,,}
