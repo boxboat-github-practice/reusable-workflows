@@ -19,7 +19,7 @@ env:
 jobs:
   plan:
     name: 'Terraform Plan'
-    runs-on: [self-hosted, podman]
+    runs-on: [self-hosted]
 
     defaults:
       run:
@@ -47,7 +47,7 @@ jobs:
     environment: dev
     if: github.ref == 'refs/heads/main'
     name: 'Terraform Apply'
-    runs-on: [self-hosted, podman]
+    runs-on: [self-hosted]
 
     defaults:
       run:
