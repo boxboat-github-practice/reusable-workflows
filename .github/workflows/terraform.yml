@@ -1,4 +1,4 @@
-name: 'Terraform'
+name: "Terraform"
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ on:
         required: true
         type: string
     outputs:
-      url: 
+      url:
         value: ${{ jobs.apply.outputs.URL }}
 
 env:
@@ -18,62 +18,63 @@ env:
 
 jobs:
   plan:
-    name: 'Terraform Plan'
+    name: "Terraform Plan"
     runs-on: [self-hosted]
-
+    container: node:14.16
     defaults:
       run:
         shell: bash
         working-directory: terraform
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Var replacement
-      run: |
-        sed -i "s/REGUSER/${{ github.actor }}/" container_app.tf
-        sed -i "s/REGPASS/${{ secrets.MY_PAT }}/" container_app.tf
-        sed -i "s/IMAGE_TAG/${{ inputs.tag }}/" container_app.tf
-        sed -i "s/GHUSER/${{ github.actor }}/" container_app.tf
+      - name: Var replacement
+        run: |
+          sed -i "s/REGUSER/${{ github.actor }}/" container_app.tf
+          sed -i "s/REGPASS/${{ secrets.MY_PAT }}/" container_app.tf
+          sed -i "s/IMAGE_TAG/${{ inputs.tag }}/" container_app.tf
+          sed -i "s/GHUSER/${{ github.actor }}/" container_app.tf
 
-    - name: Terraform Plan
-      run: |
-        terraform init
-        terraform plan -input=false
-    
+      - name: Terraform Plan
+        run: |
+          terraform init
+          terraform plan -input=false
+
   apply:
     needs: plan
     environment: dev
     if: github.ref == 'refs/heads/main'
-    name: 'Terraform Apply'
+    name: "Terraform Apply"
     runs-on: [self-hosted]
-
+    container: node:14.16
     defaults:
       run:
         shell: bash
         working-directory: terraform
-    
+
     outputs:
       url: ${{ steps.apply.outputs.URL }}
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - uses: hashicorp/setup-terraform@v2
+      - name: Checkout
+        uses: actions/checkout@v3
 
-    - name: Var replacement
-      run: |
-        sed -i "s/REGUSER/${{ github.actor }}/" container_app.tf
-        sed -i "s/REGPASS/${{ secrets.MY_PAT }}/" container_app.tf
-        sed -i "s/IMAGE_TAG/${{ inputs.tag }}/" container_app.tf
-        sed -i "s/GHUSER/${{ github.actor }}/" container_app.tf
+      - name: Var replacement
+        run: |
+          sed -i "s/REGUSER/${{ github.actor }}/" container_app.tf
+          sed -i "s/REGPASS/${{ secrets.MY_PAT }}/" container_app.tf
+          sed -i "s/IMAGE_TAG/${{ inputs.tag }}/" container_app.tf
+          sed -i "s/GHUSER/${{ github.actor }}/" container_app.tf
 
-    - name: Terraform Apply
-      id: apply
-      run: |
-        terraform init
-        terraform apply -input=false -auto-approve
-        URL=$(terraform output -raw fqdn)
-        echo $URL
-        echo "URL=${URL}" >> $GITHUB_OUTPUT
-    
+      - name: Terraform Apply
+        id: apply
+        run: |
+          terraform init
+          terraform apply -input=false -auto-approve
+          URL=$(terraform output -raw fqdn)
+          echo $URL
+          echo "URL=${URL}" >> $GITHUB_OUTPUT
