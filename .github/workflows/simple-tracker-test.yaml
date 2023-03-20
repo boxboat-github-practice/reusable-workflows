@@ -39,7 +39,7 @@ jobs:
         repository: boxboat-github-practice/simple-tracker-spec
 
     - name: Set Initial Statuses
-      if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened' }}
+      if: ${{ github.event_name == 'pull_request' && github.event.action == 'opened'  || github.event.action == 'edited' }}
       run: |
         function set-status() {
           OWNER=boxboat-github-practice
