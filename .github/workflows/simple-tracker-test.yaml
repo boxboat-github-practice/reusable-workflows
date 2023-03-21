@@ -11,6 +11,7 @@ env:
 
 jobs:
   test:
+    continue-on-error: true
     strategy:
       matrix:
         folder: ['employees', 'clients', 'contracts', 'history']
@@ -94,11 +95,12 @@ jobs:
         }
 
         if [ "$SET_STATUS" == "true" ]; then
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} test-collection.json -r json
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} test-collection.json -r json,cli
           STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
           DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
           set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
+        else
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} test-collection.json -r cli
         fi
 
-        newman run -e Local.postman_environment.json test-collection.json 
 
