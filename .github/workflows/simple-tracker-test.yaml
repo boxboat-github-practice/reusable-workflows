@@ -1,5 +1,10 @@
 on:
   workflow_call:
+    inputs:
+      port:
+        required: false
+        type: string
+        default: '8081'
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -42,13 +47,13 @@ jobs:
 
         IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}:$TAG"
         docker pull $IMAGE
-        docker run -p 8081:8081 -d $IMAGE
+        docker run -p 8081:${{ inputs.port }} -d $IMAGE
 
     - name: Build and Run new local version
       if: ${{ github.event_name == 'pull_request' }}
       run: |
         docker build . -t api
-        docker run -p 8081:8081 -d api
+        docker run -p 8081:${{ inputs.port }} -d api
 
     - name: Checkout Spec Repo
       uses: actions/checkout@v3
