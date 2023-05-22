@@ -80,7 +80,7 @@ jobs:
         echo "SET_STATUS=true" >> $GITHUB_ENV
 
     - name: install newman
-      run: npm install -g newman
+      run: npm install -g newman newman-reporter-basicmarkdown
 
     - name: run newman
       run: |
@@ -102,5 +102,10 @@ jobs:
         else
           newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
         fi
-
-
+    - name: cache results
+      uses: actions/cache@v3
+      with:
+        path: |
+	  ./newman/markdown-report*.txt
+	restore-keys: |
+	  ${{ GITHUB_REPOSITORY }}-${{ github.run_number }}-newman-markdown
