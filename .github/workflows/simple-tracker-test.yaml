@@ -105,7 +105,7 @@ jobs:
 
     - name: upload artifacts
       uses: actions/upload-artifact@v3
-      if: ${{ github.event.upload_artifact }}
+      if: github.event.upload_artifact
       with:
         name: boxboat-simple-tracker-express-api-${{ github.run_number }}-${{ matrix.folder }}-markdown
         path: newman
