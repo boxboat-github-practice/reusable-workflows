@@ -106,6 +106,6 @@ jobs:
     - name: upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        key: ${{ github.repository }}-${{ github.run_number }}-${{ matrix.folder }}-markdown
+        name: ${{ github.repository }}-${{ github.run_number }}-${{ matrix.folder }}-markdown
         path: newman
         retention-days: 1
