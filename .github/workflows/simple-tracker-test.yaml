@@ -106,5 +106,5 @@ jobs:
     - name: cache results
       uses: actions/cache@v3
       with:
-        key: ${{ GITHUB_REPOSITORY }}-${{ github.run_number }}-newman-markdown
+        key: ${{ github.repository }}-${{ github.run_number }}-newman-markdown
         path: newman
