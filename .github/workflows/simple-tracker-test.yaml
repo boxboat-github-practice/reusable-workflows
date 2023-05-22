@@ -100,7 +100,7 @@ jobs:
         }
 
         if [ "$SET_STATUS" == "true" ]; then
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r json,cli
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r json,basicmarkdown,cli
           STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
           DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
           set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
