@@ -103,8 +103,9 @@ jobs:
           newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
         fi
 
-    - name: cache results
-      uses: actions/cache@v3
+    - name: upload artifacts
+      uses: actions/upload-artifact@v3
       with:
-        key: ${{ github.repository }}-${{ github.run_number }}-newman-markdown
+        key: ${{ github.repository }}-${{ github.run_number }}-${{ matrix.folder }}-markdown
         path: newman
+        retention-days: 1
