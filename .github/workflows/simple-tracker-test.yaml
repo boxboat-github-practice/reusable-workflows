@@ -102,6 +102,7 @@ jobs:
         else
           newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
         fi
+
     - name: cache results
       uses: actions/cache@v3
       with:
