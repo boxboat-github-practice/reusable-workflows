@@ -85,7 +85,7 @@ jobs:
         echo "SET_STATUS=true" >> $GITHUB_ENV
 
     - name: install newman
-      run: npm install -g newman newman-reporter-basicmarkdown
+      run: npm install -g newman git+https://github.com/boxboat-github-practice/newman-reporter-basichugo
 
     - name: run newman
       run: |
@@ -100,7 +100,7 @@ jobs:
         }
 
         if [ "$SET_STATUS" == "true" ]; then
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r json,basicmarkdown,cli
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json --reporter-basichugo-run-number ${{ GITHUB_RUN_ID }} -r json,basichugo,cli
           STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
           DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
           set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
