@@ -99,7 +99,7 @@ jobs:
     - name: set status
       if: ${{ github.event_name == 'pull_request' }}
       run: |
-        TARGET_URL="https://github.com/${{ github.repository_owner }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.run_number }}"
+        TARGET_URL="https://github.com/${{ github.repository_owner }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}"
         function set-status() {
           curl -L \
             -X POST \
