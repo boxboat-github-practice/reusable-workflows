@@ -1,6 +1,11 @@
 on:
   workflow_call:
     inputs:
+      upload_artifact:
+        description: 'Set to `true` to upload newman output to archive'
+        required: false
+        default: false
+        type: boolean
       port:
         required: false
         type: string
@@ -80,9 +85,10 @@ jobs:
         echo "SET_STATUS=true" >> $GITHUB_ENV
 
     - name: install newman
-      run: npm install -g newman
+      run: npm install -g newman git+https://github.com/boxboat-github-practice/newman-reporter-basichugo
 
     - name: run newman
+      continue-on-error: true
       run: |
         function set-status() {
           curl -L \
@@ -95,7 +101,7 @@ jobs:
         }
 
         if [ "$SET_STATUS" == "true" ]; then
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r json,cli
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json --reporter-basichugo-runId ${{ github.run_id }} --reporter-basichugo-runNumber ${{ github.run_number }} -r json,basichugo,cli
           STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
           DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
           set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
@@ -103,4 +109,10 @@ jobs:
           newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
         fi
 
-
+    - name: upload artifacts
+      uses: actions/upload-artifact@v3
+      if: ${{ inputs.upload_artifact }}
+      with:
+        name: boxboat-simple-tracker-express-api-${{ github.run_number }}-${{ matrix.folder }}-markdown
+        path: newman
+        retention-days: 1

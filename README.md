@@ -27,10 +27,11 @@ There are workflows here designed to be used by other repos. You can use them th
       secrets: inherit
   ```
 
-- To run an API Smoke Test
+- To run an API Smoke Test, to markdown report to archive set upload_artifact to true
   ```yaml
     test:
       uses: boxboat-github-practice/reusable-workflows/.github/workflows/newman.yml@main
       with:
         url: baseUrl
+        upload_artifact: true|false
   ```
