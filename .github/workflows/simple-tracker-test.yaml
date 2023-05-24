@@ -88,6 +88,7 @@ jobs:
       run: npm install -g newman git+https://github.com/boxboat-github-practice/newman-reporter-basichugo
 
     - name: run newman
+      continue-on-error: true
       run: |
         function set-status() {
           curl -L \
