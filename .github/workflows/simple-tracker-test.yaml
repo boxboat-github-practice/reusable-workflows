@@ -66,28 +66,11 @@ jobs:
       with:
         repository: boxboat-github-practice/simple-tracker-spec
 
-    - name: Set Initial Statuses
-      if: ${{ github.event_name == 'pull_request' }}
-      run: |
-        function set-status() {
-          TARGET_URL="https://github.com/${{ github.repository_owner }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.run_number }}"
-          curl -L \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/$GITHUB_ACTION_REPOSITORY/statuses/$GITHUB_SHA \
-            -d "{\"state\":\"$2\",\"target_url\":\"$TARGET_URL\",\"description\":\"$3\",\"context\":\"$1\"}"
-        }
-
-        set-status "api-test/${{ matrix.folder }}" "pending" "Running tests"
-        
-        echo "SET_STATUS=true" >> $GITHUB_ENV
-
     - name: install newman
       run: npm install -g newman git+https://github.com/boxboat-github-practice/newman-reporter-basichugo
 
     - name: run newman
+      id: run
       continue-on-error: true
       run: |
         if [ "$SET_STATUS" == "true" ]; then
@@ -95,24 +78,6 @@ jobs:
         else
           newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
         fi
-        
-    - name: set status
-      if: ${{ github.event_name == 'pull_request' }}
-      run: |
-        TARGET_URL="https://github.com/${{ github.repository_owner }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ github.job }}"
-        function set-status() {
-          curl -L \
-            -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $GH_TOKEN"\
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository_owner }}/${{ github.repository }}/statuses/${{ github.sha }} \
-            -d "{\"state\":\"$2\",\"target_url\":\"$TARGET_URL\",\"description\":\"$3\",\"context\":\"$1\"}"
-        }
-
-        STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
-        DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
-        set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
 
     - name: upload artifacts
       uses: actions/upload-artifact@v3
@@ -121,3 +86,7 @@ jobs:
         name: boxboat-simple-tracker-express-api-${{ github.run_number }}-${{ matrix.folder }}-markdown
         path: newman
         retention-days: 1
+        
+    - name: set status
+      if: steps.run.outcome != 'success'
+      run: exit 1
