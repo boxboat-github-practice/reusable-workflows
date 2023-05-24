@@ -90,6 +90,15 @@ jobs:
     - name: run newman
       continue-on-error: true
       run: |
+        if [ "$SET_STATUS" == "true" ]; then
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json --reporter-basichugo-runId ${{ github.run_id }} --reporter-basichugo-runNumber ${{ github.run_number }} -r json,basichugo,cli
+        else
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
+        fi
+        
+    - name: set status
+      if: ${{ github.event_name == 'pull_request' }}
+      run: |
         function set-status() {
           curl -L \
             -X POST \
@@ -100,14 +109,9 @@ jobs:
             -d "{\"state\":\"$2\",\"target_url\":\"https://github.com/$OWNER/$REPO/actions/runs/$GITHUB_RUN_ID/jobs/${{ github.run_id }}\",\"description\":\"$3\",\"context\":\"$1\"}"
         }
 
-        if [ "$SET_STATUS" == "true" ]; then
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json --reporter-basichugo-runId ${{ github.run_id }} --reporter-basichugo-runNumber ${{ github.run_number }} -r json,basichugo,cli
-          STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
-          DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
-          set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
-        else
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
-        fi
+        STATUS=$(jq -r 'if (.run.failures | length) > 0 then "failure" else "success" end' newman/newman-run-report*)
+        DESCRIPTION=$(jq '.run.failures[0].error.message' newman/newman-run-report*)
+        set-status "api-test/$i" "$STATUS" "$DESCRIPTION"
 
     - name: upload artifacts
       uses: actions/upload-artifact@v3
