@@ -79,9 +79,9 @@ jobs:
       continue-on-error: true
       run: |
         if [ "$IS_PR" == "true" ]; then
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json --reporter-basichugo-runId ${{ github.run_id }} --reporter-basichugo-runNumber ${{ github.run_number }} -r json,basichugo,cli
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} api-test-collection.json --reporter-basichugo-runId ${{ github.run_id }} --reporter-basichugo-runNumber ${{ github.run_number }} -r json,basichugo,cli
         else
-          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} sql-test-collection.json -r cli
+          newman run -e Local.postman_environment.json --folder ${{ matrix.folder }} api-test-collection.json -r cli
         fi
 
     - name: upload artifacts
