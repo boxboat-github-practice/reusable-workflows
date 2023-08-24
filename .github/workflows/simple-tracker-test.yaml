@@ -92,3 +92,6 @@ jobs:
         path: newman
         retention-days: 1
         
+    - name: set status
+      if: steps.run.outcome != 'success'
+      run: exit 1
