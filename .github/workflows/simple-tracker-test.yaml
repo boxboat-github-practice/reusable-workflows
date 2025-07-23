@@ -85,7 +85,7 @@ jobs:
         fi
 
     - name: upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: ${{ inputs.upload_artifact }}
       with:
         name: boxboat-simple-tracker-express-api-${{ github.run_number }}-${{ matrix.folder }}-markdown
